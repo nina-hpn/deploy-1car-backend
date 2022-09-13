@@ -8,6 +8,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   private readonly config: ConfigService;
 
   public createTypeOrmOptions(): TypeOrmModuleOptions {
+    const stage: string = this.config.get<string>('DEVELOPMENT_STAGE');
     return {
       type: 'postgres',
       host: this.config.get<string>('DATABASE_HOST'),
@@ -18,9 +19,16 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       autoLoadEntities: true,
       migrations: ['dist/migrations/*.{ts,js}'],
       migrationsTableName: 'typeorm_migrations',
-      migrationsRun: false,
+      migrationsRun: false, //stage === 'prod',
       logger: 'file',
-      synchronize: true, // never use TRUE in production!
+      synchronize: stage === 'dev', // never use TRUE in production!,
+      ...(stage === 'prod' && {
+        extra: {
+          ssl: {
+            rejectUnauthorized: false,
+          },
+        },
+      }),
     };
   }
 }
