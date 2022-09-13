@@ -13,7 +13,7 @@ async function bootstrap() {
     rawBody: true,
   });
   const config: ConfigService = app.get(ConfigService);
-  const port: number = config.get<number>('PORT');
+  const port: number = config.get<number>('PORT') || 8080;
   app.enableCors();
   app.useGlobalGuards(
     new JwtAuthGuard(
